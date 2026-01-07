@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post New Job - Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        }
+        
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a0ca3;
+            --secondary: #7209b7;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --error: #e63946;
+        }
+        
+        body {
+            background: #f8fafc;
+            min-height: 100vh;
+        }
+        
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .sidebar-header {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 1rem;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1rem;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        .logo-text {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.5rem 0;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .user-details h4 {
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+        }
+        
+        .user-details span {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .nav-links {
+            list-style: none;
+            padding: 0 1rem;
+        }
+        
+        .nav-links li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.85rem 1rem;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .nav-links a:hover, .nav-links a.active {
+            background: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+        
+        .nav-links a i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 2rem;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .header h1 {
+            color: var(--dark);
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+        
+        /* Form Styles */
+        .form-container {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .form-group label {
+            font-weight: 500;
+            color: var(--dark);
+            font-size: 0.9rem;
+        }
+        
+        .form-control {
+            padding: 0.85rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background: #fafbff;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+        
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 2rem;
+        }
+        
+        .btn-cancel {
+            background: #e2e8f0;
+            color: var(--gray);
+        }
+        
+        .btn-submit {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        /* Job Card Section Styles */
+        .job-card-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+        
+        .job-card-section h2 {
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary);
+            display: inline-block;
+        }
+        
+        .job-card-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .job-card-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+        
+        .job-card-preview {
+            margin-top: 2rem;
+            padding: 2rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: #fafbff;
+            display: none;
+        }
+        
+        .job-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .job-card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+        
+        .job-card-logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .job-card-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .job-card-detail {
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .detail-label {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-bottom: 0.5rem;
+        }
+        
+        .detail-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .job-card-footer {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .job-card-id {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        .job-card-signature {
+            text-align: center;
+            margin-top: 2rem;
+        }
+        
+        .signature-line {
+            width: 200px;
+            border-bottom: 1px solid var(--dark);
+            margin: 0 auto 0.5rem;
+        }
+        
+        /* Service Outsource Section Styles */
+        .service-outsource-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .service-outsource-section h2 {
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary);
+            display: inline-block;
+        }
+        
+        .service-outsource-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .service-outsource-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+            }
+            
+            .sidebar .logo-text,
+            .sidebar .user-details,
+            .sidebar .nav-links span {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 80px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .job-card-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .service-outsource-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions, .job-card-actions, .service-outsource-actions {
+                flex-direction: column;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printableJobCard, #printableJobCard * {
+                visibility: visible;
+            }
+            #printableJobCard {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 3000;
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="logo-text">WorkPortal</div>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <h4>Admin User</h4>
+                        <span>Administrator</span>
+                    </div>
+                </div>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="admin-available-devices.html"><i class="fas fa-laptop"></i> <span>Available Devices</span></a></li>
+                <li><a href="admin-job-history.html"><i class="fas fa-history"></i> <span>Job History</span></a></li>
+                <li><a href="admin-post-job.html" class="active"><i class="fas fa-plus-circle"></i> <span>Post New Job</span></a></li>
+                <li><a href="admin-product-rental.html"><i class="fas fa-tools"></i> <span>Product Rental</span></a></li>
+                <li><a href="admin-settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+                <li><a href="login.html"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
+            </ul>
+        </nav>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header">
+                <h1>Post New Job</h1>
+                <div class="header-actions">
+                    <a href="admin-available-devices.html" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back to Devices</a>
+                </div>
+            </div>
+            
+            <div class="form-container">
+                <form id="jobForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="jobTitle">Job Title *</label>
+                            <input type="text" id="jobTitle" class="form-control" placeholder="Enter job title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="device">Select Device *</label>
+                            <select id="device" class="form-control" required>
+                                <option value="">Choose a device</option>
+                                <option value="lenova-slimpad-3">Lenova Slimpad 3</option>
+                                <option value="dell-precision-5760">Dell Precision 5760</option>
+                                <option value="victus">Victus</option>
+                                <option value="surface-laptop-4">Surface Laptop 4</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="priority">Priority Level</label>
+                            <select id="priority" class="form-control">
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High</option>
+                                <option value="urgent">Urgent</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="startDate">Start Date *</label>
+                            <input type="date" id="startDate" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="dueDate">Due Date *</label>
+                            <input type="date" id="dueDate" class="form-control" required>
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label for="description">Job Description *</label>
+                            <textarea id="description" class="form-control" placeholder="Describe the job requirements and tasks..." required></textarea>
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-submit"><i class="fas fa-plus-circle"></i> Create Job</button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Job Card Section -->
+           
+            
+            <!-- Service Outsource Section -->
+            <div class="service-outsource-section">
+                <h2>Service Outsource</h2>
+                
+                <form id="serviceOutsourceForm" class="service-outsource-form">
+                    <div class="form-group">
+                        <label for="serviceDeviceName">Device Name *</label>
+                        <input type="text" id="serviceDeviceName" class="form-control" placeholder="Enter device name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="serviceCompanyName">Service Company Name *</label>
+                        <input type="text" id="serviceCompanyName" class="form-control" placeholder="Enter service company name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="serviceDate">Date *</label>
+                        <input type="date" id="serviceDate" class="form-control" required>
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label for="productDetails">Product Details *</label>
+                        <textarea id="productDetails" class="form-control" placeholder="Enter product details..." required></textarea>
+                    </div>
+                </form>
+                
+                <div class="service-outsource-actions">
+                    <button type="button" id="submitServiceOutsource" class="btn btn-submit"><i class="fas fa-paper-plane"></i> Submit Service Outsource</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Printable Job Card (Hidden) -->
+    <div id="printableJobCard" style="display: none;">
+        <div style="padding: 20mm; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #4361ee;">
+                <div style="font-size: 24px; font-weight: 700; color: #3a0ca3;">JOB CARD</div>
+                <div style="font-size: 28px; font-weight: 700; color: #4361ee;">Best In Solutions</div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
+                <div style="padding: 15px; background: #f9f9f9; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <div style="font-size: 14px; color: #6c757d; margin-bottom: 8px;">Customer Name</div>
+                    <div style="font-size: 16px; font-weight: 600; color: #212529;" id="printCustomerName">-</div>
+                </div>
+                <div style="padding: 15px; background: #f9f9f9; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <div style="font-size: 14px; color: #6c757d; margin-bottom: 8px;">Phone Number</div>
+                    <div style="font-size: 16px; font-weight: 600; color: #212529;" id="printCustomerPhone">-</div>
+                </div>
+                <div style="padding: 15px; background: #f9f9f9; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <div style="font-size: 14px; color: #6c757d; margin-bottom: 8px;">Device</div>
+                    <div style="font-size: 16px; font-weight: 600; color: #212529;" id="printDevice">-</div>
+                </div>
+                <div style="padding: 15px; background: #f9f9f9; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <div style="font-size: 14px; color: #6c757d; margin-bottom: 8px;">Date</div>
+                    <div style="font-size: 16px; font-weight: 600; color: #212529;" id="printDate">-</div>
+                </div>
+                <div style="padding: 15px; background: #f9f9f9; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <div style="font-size: 14px; color: #6c757d; margin-bottom: 8px;">Job Type</div>
+                    <div style="font-size: 16px; font-weight: 600; color: #212529;" id="printJobType">-</div>
+                </div>
+                <div style="padding: 15px; background: #f9f9f9; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <div style="font-size: 14px; color: #6c757d; margin-bottom: 8px;">Status</div>
+                    <div style="font-size: 16px; font-weight: 600; color: #212529;" id="printStatus">-</div>
+                </div>
+            </div>
+            
+            <div style="padding: 15px; background: #f9f9f9; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+                <div style="font-size: 14px; color: #6c757d; margin-bottom: 8px;">Job Notes</div>
+                <div style="font-size: 16px; font-weight: 600; color: #212529;" id="printJobNotes">-</div>
+            </div>
+            
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end;">
+                <div style="text-align: center;">
+                    <div style="width: 200px; border-bottom: 1px solid #212529; margin: 0 auto 5px;"></div>
+                    <div style="font-size: 14px; color: #6c757d;">Authorized Signature</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize localStorage for jobs
+        function initializeJobStorage() {
+            if (!localStorage.getItem('availableJobs')) {
+                localStorage.setItem('availableJobs', '[]');
+            }
+            if (!localStorage.getItem('serviceOutsource')) {
+                localStorage.setItem('serviceOutsource', '[]');
+            }
+        }
+
+        // Toast notification function
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.style.background = type === 'success' ? 'var(--success)' : 'var(--error)';
+            toast.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check' : 'exclamation'}-circle"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 3000);
+        }
+
+        // Job Form Submission
+        document.getElementById('jobForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const jobData = {
+                id: 'JOB-' + Date.now(),
+                title: document.getElementById('jobTitle').value,
+                device: document.getElementById('device').value,
+                priority: document.getElementById('priority').value,
+                startDate: document.getElementById('startDate').value,
+                dueDate: document.getElementById('dueDate').value,
+                description: document.getElementById('description').value,
+                status: 'open',
+                postedDate: new Date().toLocaleDateString(),
+                type: 'status_update'
+            };
+            
+            // Save to available jobs
+            const availableJobs = JSON.parse(localStorage.getItem('availableJobs') || '[]');
+            availableJobs.push(jobData);
+            localStorage.setItem('availableJobs', JSON.stringify(availableJobs));
+            
+            showToast('Job posted successfully!');
+            this.reset();
+        });
+
+        // Job Card Generation
+        document.getElementById('generateJobCard').addEventListener('click', function() {
+            const customerName = document.getElementById('customerName').value;
+            const customerPhone = document.getElementById('customerPhone').value;
+            const customerDevice = document.getElementById('customerDevice').value;
+            const jobDate = document.getElementById('jobDate').value;
+            const jobNotes = document.getElementById('jobNotes').value;
+            
+            if (!customerName || !customerPhone || !customerDevice || !jobDate) {
+                showToast('Please fill all required fields', 'error');
+                return;
+            }
+            
+            // Update preview
+            document.getElementById('previewCustomerName').textContent = customerName;
+            document.getElementById('previewCustomerPhone').textContent = customerPhone;
+            document.getElementById('previewDevice').textContent = customerDevice;
+            document.getElementById('previewDate').textContent = jobDate;
+            document.getElementById('previewJobType').textContent = 'Repair';
+            document.getElementById('previewStatus').textContent = 'Pending';
+            document.getElementById('previewJobNotes').textContent = jobNotes || 'No notes provided';
+            
+            // Update printable version
+            document.getElementById('printCustomerName').textContent = customerName;
+            document.getElementById('printCustomerPhone').textContent = customerPhone;
+            document.getElementById('printDevice').textContent = customerDevice;
+            document.getElementById('printDate').textContent = jobDate;
+            document.getElementById('printJobType').textContent = 'Repair';
+            document.getElementById('printStatus').textContent = 'Pending';
+            document.getElementById('printJobNotes').textContent = jobNotes || 'No notes provided';
+            
+            // Show preview
+            document.getElementById('jobCardPreview').style.display = 'block';
+        });
+
+        // Print Job Card
+        document.getElementById('printJobCard').addEventListener('click', function() {
+            window.print();
+        });
+
+        // Service Outsource Submission
+        document.getElementById('submitServiceOutsource').addEventListener('click', function() {
+            const deviceName = document.getElementById('serviceDeviceName').value;
+            const companyName = document.getElementById('serviceCompanyName').value;
+            const serviceDate = document.getElementById('serviceDate').value;
+            const productDetails = document.getElementById('productDetails').value;
+            
+            if (!deviceName || !companyName || !serviceDate || !productDetails) {
+                showToast('Please fill all required fields', 'error');
+                return;
+            }
+            
+            const serviceData = {
+                id: 'SERVICE-' + Date.now(),
+                deviceName: deviceName,
+                companyName: companyName,
+                serviceDate: serviceDate,
+                productDetails: productDetails,
+                status: 'pending',
+                submittedDate: new Date().toLocaleDateString()
+            };
+            
+            // Save to service outsource
+            const serviceOutsource = JSON.parse(localStorage.getItem('serviceOutsource') || '[]');
+            serviceOutsource.push(serviceData);
+            localStorage.setItem('serviceOutsource', JSON.stringify(serviceOutsource));
+            
+            showToast('Service outsource submitted successfully!');
+            document.getElementById('serviceOutsourceForm').reset();
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeJobStorage();
+            // Set today's date as default for date fields
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('startDate').value = today;
+            document.getElementById('dueDate').value = today;
+            document.getElementById('jobDate').value = today;
+            document.getElementById('serviceDate').value = today;
+        });
+    </script>
+</body>
+</html>

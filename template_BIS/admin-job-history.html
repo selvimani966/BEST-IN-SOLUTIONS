@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job History - Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        }
+        
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a0ca3;
+            --secondary: #7209b7;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --error: #e63946;
+        }
+        
+        body {
+            background: #f8fafc;
+            min-height: 100vh;
+        }
+        
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .sidebar-header {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 1rem;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1rem;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        .logo-text {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.5rem 0;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .user-details h4 {
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+        }
+        
+        .user-details span {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .nav-links {
+            list-style: none;
+            padding: 0 1rem;
+        }
+        
+        .nav-links li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.85rem 1rem;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .nav-links a:hover, .nav-links a.active {
+            background: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+        
+        .nav-links a i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 2rem;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .header h1 {
+            color: var(--dark);
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-filter {
+            background: #e2e8f0;
+            color: var(--dark);
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-filter.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+        
+        /* Filter Section */
+        .filter-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .filter-title {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--dark);
+            font-weight: 600;
+        }
+        
+        .filter-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .date-filter-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        /* Section Styles */
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+        
+        .section h2 {
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary);
+            display: inline-block;
+        }
+        
+        /* Recent Job Updates Section */
+        .updates-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .updates-table th {
+            background: #f8fafc;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .updates-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            color: var(--gray);
+        }
+        
+        .updates-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .updates-table tr:hover {
+            background: #f8fafc;
+        }
+        
+        .job-id {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-in-progress {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        /* Completed Job History Section */
+        .jobs-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .jobs-table th {
+            background: #f8fafc;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .jobs-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            color: var(--gray);
+        }
+        
+        .jobs-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .jobs-table tr:hover {
+            background: #f8fafc;
+        }
+        
+        /* Service Outsource Section */
+        .service-outsource-item {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--warning);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .service-details-single-line {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            align-items: center;
+            flex: 1;
+        }
+        
+        .service-detail-single {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .service-detail-single label {
+            font-weight: 500;
+            color: var(--dark);
+            font-size: 0.9rem;
+        }
+        
+        .service-detail-value-single {
+            font-size: 0.9rem;
+            color: var(--dark);
+            font-weight: 500;
+        }
+        
+        .service-outsource-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .tick-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .tick-btn:hover {
+            background: #3aa8d0;
+            transform: scale(1.1);
+        }
+        
+        /* Service History Section */
+        .service-history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .service-history-table th {
+            background: #f8fafc;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .service-history-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            color: var(--gray);
+        }
+        
+        .service-history-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .service-history-table tr:hover {
+            background: #f8fafc;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray);
+            font-style: italic;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+            }
+            
+            .sidebar .logo-text,
+            .sidebar .user-details,
+            .sidebar .nav-links span {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 80px;
+            }
+            
+            .jobs-table, .updates-table {
+                overflow-x: auto;
+            }
+            
+            .service-outsource-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .service-details-single-line {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .service-outsource-actions {
+                align-self: flex-end;
+            }
+            
+            .filter-controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .date-filter-group {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="logo-text">WorkPortal</div>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <h4>Admin User</h4>
+                        <span>Administrator</span>
+                    </div>
+                </div>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="admin-available-devices.html"><i class="fas fa-laptop"></i> <span>Available Devices</span></a></li>
+                <li><a href="admin-job-history.html" class="active"><i class="fas fa-history"></i> <span>Job History</span></a></li>
+                <li><a href="admin-post-job.html"><i class="fas fa-plus-circle"></i> <span>Post New Job</span></a></li>
+                <li><a href="admin-product-rental.html"><i class="fas fa-tools"></i> <span>Product Rental</span></a></li>
+                <li><a href="admin-settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+                <li><a href="login.html"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
+            </ul>
+        </nav>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header">
+                <h1>Job History</h1>
+            </div>
+            
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <h3 class="filter-title">Filter by Date Range</h3>
+                <div class="filter-controls">
+                    <div class="date-filter-group">
+                        <button class="btn-filter active" data-days="all">All Time</button>
+                        <button class="btn-filter" data-days="7">Last 7 Days</button>
+                        <button class="btn-filter" data-days="1">Last 24 Hours</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Job Updates Section -->
+            <div class="section" id="job-updates-section">
+                <h2>Recent Job Updates</h2>
+                <table class="updates-table">
+                    <thead>
+                        <tr>
+                            <th>Job ID</th>
+                            <th>Job Title</th>
+                            <th>Device</th>
+                            <th>Employee</th>
+                            <th>Date & Time</th>
+                            <th>Report</th>
+                        </tr>
+                    </thead>
+                    <tbody id="job-updates-container">
+                        <!-- Job updates will be dynamically inserted here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Completed Job History Section -->
+            <div class="section">
+                <h2>Completed Job History</h2>
+                <table class="jobs-table">
+                    <thead>
+                        <tr>
+                            <th>Job ID</th>
+                            <th>Job Title</th>
+                            <th>Device</th>
+                            <th>Employee</th>
+                            <th>Assigned Date</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="completed-jobs-container">
+                        <!-- Completed jobs will be dynamically inserted here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Service Outsource Section -->
+            <div class="section" id="service-outsource-section">
+                <h2>Service Outsource</h2>
+                <div id="service-outsource-container">
+                    <!-- Service outsource items will be dynamically inserted here -->
+                </div>
+            </div>
+            
+            <!-- Service Outsource History Section -->
+            <div class="section">
+                <h2>Service Outsource History</h2>
+                <table class="service-history-table" id="service-history-table">
+                    <thead>
+                        <tr>
+                            <th>Service Company</th>
+                            <th>Date</th>
+                            <th>Product Details</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="serviceHistoryBody">
+                        <!-- Service history will be dynamically inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+   <script>
+    let currentFilter = 'all'; // 'all', '7', '1'
+
+    // Function to filter data by date
+    function filterByDate(data, days) {
+        if (days === 'all') return data;
+        
+        const now = new Date();
+        const filterDate = new Date();
+        filterDate.setDate(now.getDate() - parseInt(days));
+        
+        return data.filter(item => {
+            let itemDate;
+            if (item.timestamp) {
+                // For job updates - parse the timestamp
+                itemDate = new Date(item.timestamp);
+            } else if (item.completionDate) {
+                // For completed jobs - parse the completion date
+                itemDate = new Date(item.completionDate);
+            } else {
+                return true; // If no date field, include it
+            }
+            return itemDate >= filterDate;
+        });
+    }
+
+    // Function to display job updates from localStorage
+    function displayJobUpdates() {
+        const updates = JSON.parse(localStorage.getItem('jobUpdates') || '[]');
+        const filteredUpdates = filterByDate(updates, currentFilter);
+        const container = document.getElementById('job-updates-container');
+        
+        if (filteredUpdates.length === 0) {
+            container.innerHTML = '<tr><td colspan="6" class="no-data">No job updates found for selected period.</td></tr>';
+            return;
+        }
+        
+        // Sort updates by timestamp (newest first)
+        filteredUpdates.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        
+        let html = '';
+        filteredUpdates.forEach(update => {
+            html += `
+                <tr>
+                    <td><span class="job-id">${update.jobId}</span></td>
+                    <td><strong>${update.jobTitle}</strong></td>
+                    <td>${update.device || 'N/A'}</td>
+                    <td>${update.employee}</td>
+                    <td>${update.timestamp}</td>
+                    <td>${update.report}</td>
+                </tr>
+            `;
+        });
+        
+        container.innerHTML = html;
+    }
+    
+    // Function to display completed jobs from localStorage
+    function displayCompletedJobs() {
+        const completedJobs = JSON.parse(localStorage.getItem('completedJobs') || '[]');
+        const filteredJobs = filterByDate(completedJobs, currentFilter);
+        const container = document.getElementById('completed-jobs-container');
+        
+        if (filteredJobs.length === 0) {
+            container.innerHTML = '<tr><td colspan="7" class="no-data">No completed jobs found for selected period.</td></tr>';
+            return;
+        }
+        
+        // Sort by completion date (newest first)
+        filteredJobs.sort((a, b) => new Date(b.completionDate) - new Date(a.completionDate));
+        
+        let html = '';
+        filteredJobs.forEach(job => {
+            html += `
+                <tr>
+                    <td><span class="job-id">${job.jobId}</span></td>
+                    <td><strong>${job.jobTitle}</strong></td>
+                    <td>${job.device}</td>
+                    <td>${job.employee}</td>
+                    <td>${job.assignedDate}</td>
+                    <td>${job.dueDate}</td>
+                    <td><span class="status-badge status-completed">${job.status}</span></td>
+                </tr>
+            `;
+        });
+        
+        container.innerHTML = html;
+    }
+    
+    // Function to display service outsource requests
+    function displayServiceOutsource() {
+        const services = JSON.parse(localStorage.getItem('serviceOutsource') || '[]');
+        const container = document.getElementById('service-outsource-container');
+        const pendingServices = services.filter(service => service.status === 'pending');
+        
+        if (pendingServices.length === 0) {
+            container.innerHTML = '<p class="no-data">No pending service outsource requests.</p>';
+            return;
+        }
+        
+        let html = '';
+        pendingServices.forEach(service => {
+            html += `
+                <div class="service-outsource-item" data-service-id="${service.id}">
+                    <div class="service-details-single-line">
+                        <div class="service-detail-single">
+                            <label>Device Name</label>
+                            <div class="service-detail-value-single">${service.deviceName}</div>
+                        </div>
+                        <div class="service-detail-single">
+                            <label>Service Company</label>
+                            <div class="service-detail-value-single">${service.companyName}</div>
+                        </div>
+                        <div class="service-detail-single">
+                            <label>Date</label>
+                            <div class="service-detail-value-single">${service.serviceDate}</div>
+                        </div>
+                        <div class="service-detail-single">
+                            <label>Product Details</label>
+                            <div class="service-detail-value-single">${service.productDetails}</div>
+                        </div>
+                    </div>
+                    <div class="service-outsource-actions">
+                        <button type="button" class="tick-btn complete-service-btn" data-id="${service.id}">
+                            <i class="fas fa-check"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+        
+        // Add event listeners to complete buttons
+        document.querySelectorAll('.complete-service-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const serviceId = this.getAttribute('data-id');
+                completeServiceOutsource(serviceId);
+            });
+        });
+    }
+    
+    // Function to display service history
+    function displayServiceHistory() {
+        const services = JSON.parse(localStorage.getItem('serviceOutsource') || '[]');
+        const completedServices = services.filter(service => service.status === 'completed');
+        const container = document.getElementById('serviceHistoryBody');
+        
+        if (completedServices.length === 0) {
+            container.innerHTML = '<tr><td colspan="4" class="no-data">No service history available.</td></tr>';
+            return;
+        }
+        
+        let html = '';
+        completedServices.forEach(service => {
+            html += `
+                <tr>
+                    <td>${service.companyName}</td>
+                    <td>${service.completedDate || service.serviceDate}</td>
+                    <td>${service.productDetails}</td>
+                    <td><span class="status-badge status-completed">Completed</span></td>
+                </tr>
+            `;
+        });
+        
+        container.innerHTML = html;
+    }
+    
+    // Function to handle service outsource completion
+    function completeServiceOutsource(serviceId) {
+        const services = JSON.parse(localStorage.getItem('serviceOutsource') || '[]');
+        const serviceIndex = services.findIndex(service => service.id === serviceId);
+        
+        if (serviceIndex === -1) {
+            alert('Service not found!');
+            return;
+        }
+        
+        // Update service status
+        services[serviceIndex].status = 'completed';
+        services[serviceIndex].completedDate = new Date().toLocaleDateString();
+        
+        // Save updated services
+        localStorage.setItem('serviceOutsource', JSON.stringify(services));
+        
+        // Remove from service outsource section and refresh displays
+        displayServiceOutsource();
+        displayServiceHistory();
+        
+        alert('Service marked as completed and moved to history!');
+    }
+    
+    // Function to handle filter changes
+    function handleFilterChange(days) {
+        currentFilter = days;
+        
+        // Update active button
+        document.querySelectorAll('.btn-filter').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.getAttribute('data-days') === days) {
+                btn.classList.add('active');
+            }
+        });
+        
+        // Refresh displays
+        displayJobUpdates();
+        displayCompletedJobs();
+    }
+    
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize storage if not exists
+        if (!localStorage.getItem('jobUpdates')) {
+            localStorage.setItem('jobUpdates', '[]');
+        }
+        if (!localStorage.getItem('completedJobs')) {
+            localStorage.setItem('completedJobs', '[]');
+        }
+        if (!localStorage.getItem('serviceOutsource')) {
+            localStorage.setItem('serviceOutsource', '[]');
+        }
+        
+        // Add event listeners to filter buttons
+        document.querySelectorAll('.btn-filter').forEach(button => {
+            button.addEventListener('click', function() {
+                const days = this.getAttribute('data-days');
+                handleFilterChange(days);
+            });
+        });
+        
+        // Initial display
+        displayJobUpdates();
+        displayCompletedJobs();
+        displayServiceOutsource();
+        displayServiceHistory();
+        
+        // Refresh updates every 5 seconds
+        setInterval(() => {
+            displayJobUpdates();
+            displayCompletedJobs();
+        }, 5000);
+    });
+</script>
+</body>
+</html>
